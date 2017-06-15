@@ -1,7 +1,6 @@
 class CircularCardLinkComponent extends HTMLElement {
     constructor() {
         super()
-        this.color = this.getAttribute('color')
         this.href = this.getAttribute('href')
         this.src = this.getAttribute('src')
         this.img = document.createElement('img')
@@ -30,3 +29,27 @@ class CircularCardLinkComponent extends HTMLElement {
     }
 }
 customElements.define('circular-card-link-component',CircularCardLinkComponent)
+
+class ColorFilterCircle {
+    constructor() {
+        this.deg = 0
+    }
+    draw(context,radius) {
+        context.save()
+        context.beginPath()
+        context.fillStyle = 'black'
+        context.globalAlpha = 0.5
+        context.lineTo(0,0)
+        for(var i=0;i<deg;i++) {
+            const x = radius*Math.cos(i*Math.PI/180),y = radius*Math.sin(i*Math)
+            context.lineTo(x,y)
+        }
+        context.restore()
+    }
+    update(dir) {
+        this.deg += dir*(360/15)
+    }
+    setEdgeValue(dir) {
+        this.deg = 180*(1+dir)
+    }
+}
