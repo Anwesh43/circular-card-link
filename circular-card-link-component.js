@@ -1,3 +1,4 @@
+const maxAnimLimit = 15
 class CircularCardLinkComponent extends HTMLElement {
     constructor() {
         super()
@@ -20,6 +21,11 @@ class CircularCardLinkComponent extends HTMLElement {
         context.drawImage(this.image,0,0)
         context.restore()
     }
+    update(dir) {
+    }
+    setEdgeValue(dir) {
+        
+    }
     connectedCallback() {
         this.image = new Image()
         this.image.src = this.src
@@ -28,8 +34,6 @@ class CircularCardLinkComponent extends HTMLElement {
         }
     }
 }
-customElements.define('circular-card-link-component',CircularCardLinkComponent)
-
 class ColorFilterCircle {
     constructor() {
         this.deg = 0
@@ -47,9 +51,32 @@ class ColorFilterCircle {
         context.restore()
     }
     update(dir) {
-        this.deg += dir*(360/15)
+        this.deg += dir*(360/maxAnimLimit)
     }
     setEdgeValue(dir) {
         this.deg = 180*(1+dir)
     }
 }
+class AnimationHandler {
+    constructor(component) {
+        this.dir = 0
+        this.prevDir = -1
+        this.counter = 0
+        this.component = component
+    }
+    start()  {
+        this.dir = this.prevDir * -1
+        const interval = setInterval(()=>{
+            this.component.render()
+            this.component.update(this.dir)
+            this.counter++
+            if(this.counter == maxAnimLimit+1) {
+                this.counter = 0
+                clearInterval(interval)
+                this.prevDir = this.dir
+                this.
+            }
+        },50)
+    }
+}
+customElements.define('circular-card-link-component',CircularCardLinkComponent)
