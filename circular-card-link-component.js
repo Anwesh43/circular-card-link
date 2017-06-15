@@ -2,6 +2,8 @@ const maxAnimLimit = 8
 class CircularCardLinkComponent extends HTMLElement {
     constructor() {
         super()
+        this.over = false
+        this.out = false
         this.href = this.getAttribute('href')
         this.src = this.getAttribute('src')
         this.img = document.createElement('img')
@@ -40,10 +42,21 @@ class CircularCardLinkComponent extends HTMLElement {
             this.render()
         }
         this.img.onmouseover = (event) => {
-            this.animationHandler.handleAnimation(1)
+            if(this.over == false) {
+                this.animationHandler.handleAnimation(1)
+                this.over = true
+                this.out = false
+            }
         }
         this.img.onmouseout = (event) => {
-            this.animationHandler.handleAnimation(-1)
+            if(this.out == false) {
+                this.animationHandler.handleAnimation(-1)
+                this.out = true
+                this.over = false
+            }
+        }
+        this.img.onmousedown = (event) => {
+            window.location = this.href
         }
     }
 }
