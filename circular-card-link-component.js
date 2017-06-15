@@ -1,4 +1,4 @@
-const maxAnimLimit = 15
+const maxAnimLimit = 8
 class CircularCardLinkComponent extends HTMLElement {
     constructor() {
         super()
@@ -24,7 +24,8 @@ class CircularCardLinkComponent extends HTMLElement {
         context.clip()
         context.drawImage(this.image,0,0)
         context.restore()
-        this.colorFilterCircle.draw(context,w/2)
+        this.colorFilterCircle.draw(context,w/2,h/2,Math.max(w,h)/2)
+        this.img.src = canvas.toDataURL()
     }
     update(dir) {
         this.colorFilterCircle.update(dir)
@@ -38,22 +39,30 @@ class CircularCardLinkComponent extends HTMLElement {
         this.image.onload = () => {
             this.render()
         }
+        this.img.onmouseover = (event) => {
+            this.animationHandler.handleAnimation(1)
+        }
+        this.img.onmouseout = (event) => {
+            this.animationHandler.handleAnimation(-1)
+        }
     }
 }
 class ColorFilterCircle {
     constructor() {
         this.deg = 0
     }
-    draw(context,radius) {
+    draw(context,cx,cy,radius) {
         context.save()
+        context.translate(cx,cy)
         context.beginPath()
         context.fillStyle = 'black'
         context.globalAlpha = 0.5
         context.lineTo(0,0)
-        for(var i=0;i<deg;i++) {
-            const x = radius*Math.cos(i*Math.PI/180),y = radius*Math.sin(i*Math)
+        for(var i=0;i<=this.deg;i++) {
+            const x = radius*Math.cos(i*Math.PI/180),y = radius*Math.sin(i*Math.PI/180)
             context.lineTo(x,y)
         }
+        context.fill()
         context.restore()
     }
     update(dir) {
@@ -66,12 +75,10 @@ class ColorFilterCircle {
 class AnimationHandler {
     constructor(component) {
         this.dir = 0
-        this.prevDir = -1
         this.counter = 0
         this.component = component
     }
     start()  {
-        this.dir = this.prevDir * -1
         const interval = setInterval(()=>{
             this.component.render()
             this.component.update(this.dir)
@@ -79,12 +86,22 @@ class AnimationHandler {
             if(this.counter == maxAnimLimit+1) {
                 this.counter = 0
                 clearInterval(interval)
-                this.prevDir = this.dir
                 this.component.setEdgeValue(this.dir)
                 this.dir = 0
                 this.component.render()
             }
-        },50)
+        },10)
+    }
+    handleAnimation(dir) {
+        if(this.dir == 0) {
+            this.dir = dir
+            this.counter = 0
+            this.start()
+        }
+        else if(this.dir != dir){
+            this.dir = dir
+            this.counter = maxAnimLimit+1-this.counter
+        }
     }
 }
-customElements.define('circular-card-link-component',CircularCardLinkComponent)
+customElements.define('circular-card-link',CircularCardLinkComponent)
