@@ -7,12 +7,16 @@ class CircularCardLinkComponent extends HTMLElement {
         this.img = document.createElement('img')
         const shadow = this.attachShadow({mode:'open'})
         shadow.appendChild(this.img)
+        this.animationHandler = new AnimationHandler(this)
     }
     render() {
         const canvas = document.createElement('canvas')
         canvas.width = this.image.width
         canvas.height = this.image.height
         const w = canvas.width,h = canvas.height
+        if(!this.colorFilterCircle) {
+            this.colorFilterCircle = new ColorFilterCircle()
+        }
         const context = canvas.getContext('2d')
         context.save()
         context.beginPath()
@@ -20,11 +24,13 @@ class CircularCardLinkComponent extends HTMLElement {
         context.clip()
         context.drawImage(this.image,0,0)
         context.restore()
+        this.colorFilterCircle.draw(context,w/2)
     }
     update(dir) {
+        this.colorFilterCircle.update(dir)
     }
     setEdgeValue(dir) {
-        
+        this.colorFilterCircle.setEdgeValue(dir)
     }
     connectedCallback() {
         this.image = new Image()
@@ -74,7 +80,9 @@ class AnimationHandler {
                 this.counter = 0
                 clearInterval(interval)
                 this.prevDir = this.dir
-                this.
+                this.component.setEdgeValue(this.dir)
+                this.dir = 0
+                this.component.render()
             }
         },50)
     }
